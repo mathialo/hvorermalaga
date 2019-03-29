@@ -8,7 +8,7 @@
 		// Database of Malaga placements. Lat, long, epoch.
 		var malagaPlaceTimes = [
 			[52.147041, 4.492871, 1528547903], // Leiden 2018	
-		[50.075745, 14.438201, 1565440703] // Praha 2019
+			[50.075745, 14.438201, 1565440703] // Praha 2019
 		]
 
 		function getCurrentEpochStamp() {
@@ -32,7 +32,10 @@
 			nextPlace = null;
 
 			for (var i = 0; i < malagaPlaceTimes.length; i++) {
-				if (malagaPlaceTimes[i][2] > currentEpoch) next_place = malagaPlaceTimes[i];
+				if (malagaPlaceTimes[i][2] > currentEpoch) {
+					next_place = malagaPlaceTimes[i];
+					break;
+				}
 				else last_place = malagaPlaceTimes[i];
 			}
 
