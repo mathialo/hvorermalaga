@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Hvor er Malaga?</title>
+	<link rel="stylesheet" type="text/css" href="mainstyle.css">
+	<link rel="stylesheet" type="text/css" href="elements.css">
+	<script type="text/javascript">
+		// Database of Malaga placements. Lat, long, epoch.
+		var malagaPlaceTimes = [
+			[52.147041, 4.492871, 1528547903], // Leiden 2018	
+		[50.075745, 14.438201, 1565440703] // Praha 2019
+		]
+
+		function getCurrentEpochStamp() {
+			return Math.round((new Date()).getTime() / 1000);
+		}
+
+		function interpolate(from, to, time) {
+			percent = (time - from[2]) / (to[2] - from[2])
+			
+			return [
+				from[0] + (to[0] - from[0])*percent,
+				from[1] + (to[1] - from[1])*percent,
+				time
+			];
+		}
+
+		function getCurrentMalagaDestination() {
+			currentEpoch = getCurrentEpochStamp();
+
+			lastPlace = malagaPlaceTimes[0];
+			nextPlace = null;
+
+			for (var i = 0; i < malagaPlaceTimes.length; i++) {
+				if (malagaPlaceTimes[i][2] > currentEpoch) next_place = malagaPlaceTimes[i];
+				else last_place = malagaPlaceTimes[i];
+			}
+
+			currentPoint = interpolate(last_place, next_place, currentEpoch);
+
+			document.getElementById("mapFrame").src = "https://maps.google.com/maps?f=q&source=s_q&hl=en&geocode=&q=" + currentPoint[0] + "," + currentPoint[1] +"&z=5&output=embed";
+		}
+	</script>
+</head>
+<body onload="getCurrentMalagaDestination()">
+	<div class="center">
+		<h1>Hvor er Malaga?</h1>
+		<iframe width="100%" height="500" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" id="mapFrame" src="">
+		</iframe>
+		<div class="center element">
+			<p style="margin-top: 60px; text-align: center;">Malaga er en flytende bystad, som har en tendens til å flytte litt på seg fra år til år. Denne nettsiden vil alltid gi deg presis informasjon om hvor Malaga skulle befinne seg i akkurat dette øyeblikk. Du kan lese mer om Malaga på <a href="https://foreninger.uio.no/bb/arrangementer/málaga-tour/">Biørneblæs sine nettsider</a>.</p>
+		</div>
+	</div>
+</body>
+</html>
