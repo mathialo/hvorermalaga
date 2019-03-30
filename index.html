@@ -7,6 +7,34 @@
 		body {
 			margin: 0pt;
 			padding: 0pt;
+			background-color: #FFFFFF;
+		}
+
+		.slider {
+			width:300px;
+			-webkit-appearance: none;  
+			appearance: none;
+			height: 25px; 
+			background: #d3d3d3; 
+			outline: none; 
+			opacity: 0.7; 
+			-webkit-transition: .2s; 
+			transition: opacity .2s;
+		}
+		.slider::-webkit-slider-thumb {
+			-webkit-appearance: none; 
+			appearance: none;
+			width: 25px; 
+			height: 25px; 
+			background: #4CAF50; 
+			cursor: pointer; 
+		}
+
+		.slider::-moz-range-thumb {
+			width: 25px; 
+			height: 25px; 
+			background: #4CAF50; 
+			cursor: pointer; 
 		}
 
 		* {
@@ -14,7 +42,6 @@
 		}
 
 		p {
-			/*text-indent: 18pt;*/
 			margin-bottom: 12pt;
 			font-size: 12pt;
 			font-weight: 300;
@@ -28,8 +55,8 @@
 		}
 
 		.center {
-			margin-right: auto;
 			margin-left: auto;
+			margin-right: auto;
 		}
 
 		a {
@@ -46,9 +73,13 @@
 	<script type="text/javascript">
 		// Database of Malaga placements. Lat, long, epoch.
 		var malagaPlaceTimes = [
-			[52.147041, 4.492871, 1528547903], // Leiden 2018	
-			[50.075745, 14.438201, 1565440703] // Praha 2019
+			[55.686726, 12.575304, 1438263269], // Kjøben 2015
+			[60.411327, 8.442480, 1486906469],  // Dagali 2017, lol
+			[52.147041, 4.492871, 1528547903],  // Leiden 2018	
+			[50.075745, 14.438201, 1565440703]  // Praha 2019
 		]
+
+		var norwegianMonths = ["Jan", "Feb", "Mars", "Apr", "Mai", "Juni", "Juli", "Aug", "Sept", "Okt", "Nov", "Des"];
 
 		function getCurrentEpochStamp() {
 			return Math.round((new Date()).getTime() / 1000);
@@ -64,30 +95,56 @@
 			];
 		}
 
-		function getCurrentMalagaDestination() {
-			currentEpoch = getCurrentEpochStamp();
-
+		function updateMalagaPosition(epoch) {
 			lastPlace = malagaPlaceTimes[0];
 			nextPlace = null;
 
 			for (var i = 0; i < malagaPlaceTimes.length; i++) {
-				if (malagaPlaceTimes[i][2] > currentEpoch) {
+				if (malagaPlaceTimes[i][2] > epoch) {
 					next_place = malagaPlaceTimes[i];
 					break;
 				}
 				else last_place = malagaPlaceTimes[i];
 			}
 
-			currentPoint = interpolate(last_place, next_place, currentEpoch);
+			currentPoint = interpolate(last_place, next_place, epoch);
 
 			document.getElementById("mapFrame").src = "https://maps.google.com/maps?f=q&source=s_q&hl=en&geocode=&q=" + currentPoint[0] + "," + currentPoint[1] +"&z=5&output=embed";
 		}
+
+		function getMalagaPositionFromRange() {
+			start = malagaPlaceTimes[0][2];
+			end = malagaPlaceTimes[malagaPlaceTimes.length-1][2];
+
+			rangePos = document.getElementById("timelineInput").value
+			time = start + (getCurrentEpochStamp()-start)*rangePos/100-1
+			
+			if (rangePos == 100) document.getElementById("dateOutput").innerHTML = "I dag";
+			else {
+				var d = new Date(0);
+				d.setUTCSeconds(time);
+
+				document.getElementById("dateOutput").innerHTML = d.getDate() + ". " + norwegianMonths[d.getMonth()] + " " + d.getFullYear();
+			} 
+
+			updateMalagaPosition(time);
+		}
+
+		function getCurrentMalagaPosition() {
+			updateMalagaPosition(getCurrentEpochStamp());
+		}
+
+		function setupDivs() {
+			document.getElementById("fillerDiv").style.height = document.getElementById("mapFrame").offsetHeight + "px";
+			document.getElementById("fillerDiv").style.width = 100;
+		}
 	</script>
 </head>
-<body onload="getCurrentMalagaDestination()">
+<body onload="getCurrentMalagaPosition(), setupDivs()">
 	<h1>Hvor er Malaga?</h1>
 	<iframe class="center" style="position: absolute; width: 100%; height: 70%; border: none" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" id="mapFrame" src="">
-	</iframe>
+	</iframe><div id="fillerDiv" class="center"></div>
+	<div class="center" style="width:300px"><input type="range" min="1" max="100" value="100" class="slider center" id="timelineInput" onchange="getMalagaPositionFromRange()"><br><p id="dateOutput">I dag</p></div>
 	<div style="position: absolute; bottom: 5px; width: 100%">
 		<p style="margin-top: 60px; text-align: center;"><a href="https://foreninger.uio.no/bb/arrangementer/málaga-tour/">Forklaring</a></p>
 	</div>
