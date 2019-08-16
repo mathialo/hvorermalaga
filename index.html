@@ -12,29 +12,29 @@
 
 		.slider {
 			width:300px;
-			-webkit-appearance: none;  
+			-webkit-appearance: none;
 			appearance: none;
-			height: 25px; 
-			background: #d3d3d3; 
-			outline: none; 
-			opacity: 0.7; 
-			-webkit-transition: .2s; 
+			height: 25px;
+			background: #d3d3d3;
+			outline: none;
+			opacity: 0.7;
+			-webkit-transition: .2s;
 			transition: opacity .2s;
 		}
 		.slider::-webkit-slider-thumb {
-			-webkit-appearance: none; 
+			-webkit-appearance: none;
 			appearance: none;
-			width: 25px; 
-			height: 25px; 
-			background: #4CAF50; 
-			cursor: pointer; 
+			width: 25px;
+			height: 25px;
+			background: #4CAF50;
+			cursor: pointer;
 		}
 
 		.slider::-moz-range-thumb {
-			width: 25px; 
-			height: 25px; 
-			background: #4CAF50; 
-			cursor: pointer; 
+			width: 25px;
+			height: 25px;
+			background: #4CAF50;
+			cursor: pointer;
 		}
 
 		* {
@@ -75,7 +75,7 @@
 		var malagaPlaceTimes = [
 			[55.686726, 12.575304, 1438263269], // Kjøben 2015
 			[60.411327, 8.442480, 1486906469],  // Dagali 2017, lol
-			[52.147041, 4.492871, 1528547903],  // Leiden 2018	
+			[52.147041, 4.492871, 1528547903],  // Leiden 2018
 			[50.086238, 14.406883, 1565440703]  // Praha 2019
 		]
 
@@ -86,8 +86,10 @@
 		}
 
 		function interpolate(from, to, time) {
+			if (from === to) return from;
+
 			percent = (time - from[2]) / (to[2] - from[2])
-			
+
 			return [
 				from[0] + (to[0] - from[0])*percent,
 				from[1] + (to[1] - from[1])*percent,
@@ -101,13 +103,23 @@
 
 			for (var i = 0; i < malagaPlaceTimes.length; i++) {
 				if (malagaPlaceTimes[i][2] > epoch) {
-					next_place = malagaPlaceTimes[i];
+					nextPlace = malagaPlaceTimes[i];
 					break;
 				}
-				else last_place = malagaPlaceTimes[i];
+				else lastPlace = malagaPlaceTimes[i];
 			}
 
-			currentPoint = interpolate(last_place, next_place, epoch);
+			// If null, there are no next Malaga :( Set place to last to avoid nullpointers
+			if (nextPlace == null) {
+				nextPlace = lastPlace;
+			}
+
+			console.log(lastPlace);
+			console.log(nextPlace);
+
+			currentPoint = interpolate(lastPlace, nextPlace, epoch);
+
+			console.log(currentPoint)
 
 			document.getElementById("mapFrame").src = "https://maps.google.com/maps?f=q&source=s_q&hl=en&geocode=&q=" + currentPoint[0] + "," + currentPoint[1] +"&z=5&output=embed";
 		}
@@ -118,14 +130,14 @@
 
 			rangePos = document.getElementById("timelineInput").value
 			time = start + (getCurrentEpochStamp()-start)*rangePos/100-1
-			
+
 			if (rangePos == 100) document.getElementById("dateOutput").innerHTML = "I dag";
 			else {
 				var d = new Date(0);
 				d.setUTCSeconds(time);
 
 				document.getElementById("dateOutput").innerHTML = d.getDate() + ". " + norwegianMonths[d.getMonth()] + " " + d.getFullYear();
-			} 
+			}
 
 			updateMalagaPosition(time);
 		}
