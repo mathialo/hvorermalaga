@@ -11,7 +11,7 @@
 		}
 
 		.slider {
-			width:300px;
+			width: 100%;
 			-webkit-appearance: none;
 			appearance: none;
 			height: 25px;
@@ -128,14 +128,14 @@
 			document.getElementById("mapFrame").src = "https://maps.google.com/maps?f=q&source=s_q&hl=en&geocode=&q=" + currentPoint[0] + "," + currentPoint[1] +"&z=5&output=embed";
 		}
 
-		function getMalagaPositionFromRange() {
+		function updateTimeFromRange() {
 			start = malagaPlaceTimes[0][2];
 			end = malagaPlaceTimes[malagaPlaceTimes.length-1][2];
 
 			rangePos = document.getElementById("timelineInput").value
-			time = start + (getCurrentEpochStamp()-start)*rangePos/100-1
+			time = start + (getCurrentEpochStamp()-start)*rangePos/1000-1
 
-			if (rangePos == 100) document.getElementById("dateOutput").innerHTML = "I dag";
+			if (rangePos == 1000) document.getElementById("dateOutput").innerHTML = "I dag";
 			else {
 				var d = new Date(0);
 				d.setUTCSeconds(time);
@@ -143,6 +143,11 @@
 				document.getElementById("dateOutput").innerHTML = d.getDate() + ". " + norwegianMonths[d.getMonth()] + " " + d.getFullYear();
 			}
 
+			return time;
+		}
+
+		function getMalagaPositionFromRange() {
+			var time = updateTimeFromRange();
 			updateMalagaPosition(time);
 		}
 
@@ -160,7 +165,7 @@
 	<h1>Hvor er Malaga?</h1>
 	<iframe class="center" style="position: absolute; width: 100%; height: 65%; border: none" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" id="mapFrame" src="">
 	</iframe><div id="fillerDiv" class="center"></div>
-	<div class="center" style="width:300px"><input type="range" min="1" max="100" value="100" class="slider center" id="timelineInput" onchange="getMalagaPositionFromRange()"><br><p id="dateOutput">I dag</p></div>
+	<div class="center" style="width:80%"><input type="range" min="1" max="1000" value="1000" class="slider center" id="timelineInput" onchange="getMalagaPositionFromRange()" oninput="updateTimeFromRange()"><br><p id="dateOutput">I dag</p></div>
 	<div style="position: absolute; bottom: 5px; width: 100%">
 		<p style="margin-top: 60px; text-align: center;"><a href="https://foreninger.uio.no/bb/arrangementer/málaga-tour/">Forklaring</a></p>
 	</div>
